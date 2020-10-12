@@ -43,6 +43,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Analyser.cs" />
+    <Compile Include="Error.cs" />
+    <Compile Include="ErrorType.cs" />
+    <Compile Include="MyConsole.cs" />
+    <Compile Include="MyFileManager.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

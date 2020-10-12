@@ -10,6 +10,25 @@ namespace Devoir_2_Analyse
     {
         static void Main(string[] args)
         {
+            string fileName = MyConsole.AskFileName();
+
+            string code = MyFileManager.ReadFromFile(fileName);
+
+            Analyser analyser = new Analyser(code);
+
+            List<Error> errors = analyser.CheckCode();
+
+            /*if(errors.Count != 0)
+            {
+                foreach(Error error in errors)
+                {
+                    error.DisplayError();
+                }
+            }
+            else
+            {
+                MyConsole.NoErrorFound();
+            }*/
         }
     }
 }
