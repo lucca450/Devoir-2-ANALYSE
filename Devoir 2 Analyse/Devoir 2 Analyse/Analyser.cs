@@ -337,7 +337,7 @@ namespace Devoir_2_Analyse
 
                     if (!Regex.IsMatch(word, "([A-Za-z]{1}[a-zA-Z0-9]{0,7})$"))
                         errors.Add(new Error(ErrorType.WrongIdenFormat, word));
-                    if (!keywords.Contains(word))
+                    if (keywords.Contains(word))
                         errors.Add(new Error(ErrorType.CantUseReservedKeywords, word));
 
                     if (isLast)
@@ -353,10 +353,13 @@ namespace Devoir_2_Analyse
                     }
                     break;
                 case true when type == "declaration":
-                    if (Regex.IsMatch(word, "( +[A-Za-z]+ *:{1} *reel *; +| +[A-Za-z]+ *:{1} *entier *; +)$"))
+                    if (Regex.IsMatch(word, "( *[A-Za-z]+ *:{1} *reel *; *| *[A-Za-z]+ *:{1} *entier *; *)$"))
                     {
                         string variable = word.Trim().Substring(0, word.IndexOf(":")).Trim();
-                        string varType = word.Trim().Substring(word.IndexOf(":", word.Length - word.IndexOf(":"))).Trim();
+                        string varType = word.Trim().Substring(word.IndexOf(":") +1 , (word.Length - (word.Length - word.IndexOf(";")))-2 ).Trim();
+                        //string varType = word.Trim().Substring(word.IndexOf(":", word.Length - word.IndexOf(":"))).Trim();
+                        
+
 
                         data.variables.Add(new Variable(variable, varType));
                     }
