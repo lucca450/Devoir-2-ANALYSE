@@ -8,6 +8,20 @@ using System.Threading.Tasks;
 
 namespace Devoir_2_Analyse
 {
+    class Data
+    {
+        public string firstIden;
+        public List<Variable> variables;
+        public string lastIden;
+
+        public Data()
+        {
+            firstIden = "";
+            lastIden = "";
+            variables = new List<Variable>();
+        }
+    }
+
     struct Variable
     {
         string name;
@@ -24,10 +38,10 @@ namespace Devoir_2_Analyse
     class Analyser
     {
         private List<Error> errors;
-        private List<Variable> variables;
         private string code;
         private List<string> lines;
         private List<string> keywords = new List<string>() { "Procedure", "declare", "entier", "reel", "Fin_Procedure" };
+        private Data data = new Data();
             
         public Analyser(string code)
         {
@@ -35,12 +49,11 @@ namespace Devoir_2_Analyse
             this.code = code.Replace('\n', ' ');
             lines = new List<string>();
             errors = new List<Error>();
-            variables = new List<Variable>();
         }
 
         public List<Error> CheckCode()
         {
-            List<string> foundKeyWords = ReadProgram();
+            VerifyProgram();
 
             return errors;
         }
@@ -58,34 +71,6 @@ namespace Devoir_2_Analyse
             }
         }
 
-        private bool CheckDeclarationFormat(string codeBetween)
-        {
-            if (Regex.IsMatch(codeBetween, "(declare +[A-Za-z]+ *:{1} *reel *; +|declare +[A-Za-z]+ *:{1} *entier *; +)$"))
-            {
-                return true;
-            }
-            else
-            {
-                errors.Add(new Error(ErrorType.WrongDeclarationFormat, codeBetween));
-                return false;
-            }
-        }
-
-        private bool CheckIdenFormat(string identificator)
-        {
-            if (!Regex.IsMatch(identificator, "([A-Za-z]{1}[a-zA-Z0-9]{0,7})$"))
-            {
-                errors.Add(new Error(ErrorType.WrongIdenFormat, identificator));
-                return false;
-            }
-            if (!keywords.Contains(identificator))
-            {
-                errors.Add(new Error(ErrorType.CantUseReservedKeywords, identificator));
-                return false;
-            }
-            return true;
-        }
-
         private string GetCodeBetweenTwoKeywords(string kw, string nextKw)
         {
             code = code.Substring(kw.Length, code.Length - (kw.Length));
@@ -97,25 +82,15 @@ namespace Devoir_2_Analyse
         }
 
 
-        private List<string> ReadProgram()
+        private void VerifyProgram()
         {
-            int i = 0;
-            string nomProcedure = "";
-
-
             bool lfProcedure = true;
             bool foundBeginning = false;
             bool lfnom = false;
             bool lfdeclare = false;
             bool foundDeclare = false;
-            bool lfvariable = false;
-            bool lfcolon = false;
-            bool lftype = false;
-            bool lfsemicolon = false;
-            bool lfvariableaffectation = false;
-            bool lfsymbole = false;
+            bool lfvariabletype = false;
             bool lfterm = false;
-            bool lfoperator = false;
             bool lfFinProc = false;
 
             string word = "";
@@ -126,7 +101,7 @@ namespace Devoir_2_Analyse
                     case true when lfProcedure:
                         if (!foundBeginning)
                         {
-                            if(c != ' ')
+                            if (c != ' ')
                             {
                                 foundBeginning = true;
                                 word += c;
@@ -168,14 +143,14 @@ namespace Devoir_2_Analyse
                         }
                         else
                         {
-                            if(c == ' ')
+                            if (c == ' ')
                             {
-                                nomProcedure = word;
-                                word = "";
                                 lfnom = false;
                                 lfdeclare = true;
                                 foundBeginning = false;
-                                lines.Add(nomProcedure);
+                                Verify(word, "identificator");
+                                //lines.Add(word);
+                                word = "";
                             }
                             else
                             {
@@ -189,11 +164,20 @@ namespace Devoir_2_Analyse
                             if (c != ' ')
                             {
                                 foundBeginning = true;
+                                if (c != 'd')
+                                {
+                                    lfdeclare = false;
+                                    lfterm = true;
+                                    word += c;
+                                    break;
+                                }
+                                
                                 word += c;
                             }
                         }
                         else
                         {
+                            
                             if (c == ' ')
                             {
                                 word = "";
@@ -205,12 +189,12 @@ namespace Devoir_2_Analyse
                                 word += c;
                             }
 
-                            if (word.Length == "declare".Length)
+                            if(word.Length == "declare".Length)
                             {
                                 if (word == "declare")
                                 {
                                     lfdeclare = false;
-                                    lfnom = true;
+                                    lfvariabletype = true;
                                     foundBeginning = false;
                                     word = "";
                                     foundDeclare = true;
@@ -231,34 +215,7 @@ namespace Devoir_2_Analyse
                             }
                         }
                         break;
-
-                    case true when lfvariable:
-                        if (!foundBeginning)
-                        {
-                            if (c != ' ')
-                            {
-                                foundBeginning = true;
-                                word += c;
-                            }
-                        }
-                        else
-                        {
-                            if (c == ':')
-                            {
-                                string var = word;
-                                word = "";
-                                lfvariable = false;
-                                lftype = true;
-                                foundBeginning = false;
-                                lines.Add(var);
-                            }
-                            else
-                            {
-                                word += c;
-                            }
-                        }
-                        break;
-                    case true when lftype:
+                    case true when lfvariabletype:
                         if (!foundBeginning)
                         {
                             if (c != ' ')
@@ -271,12 +228,12 @@ namespace Devoir_2_Analyse
                         {
                             if (c == ';')
                             {
-                                string type = word;
-                                word = "";
-                                lftype = false;
+                                lfvariabletype = false;
                                 lfdeclare = true;
                                 foundBeginning = false;
-                                lines.Add(type);
+                                Verify(word + ";", "declaration");
+                                //lines.Add(word + ";");
+                                word = "";
                             }
                             else
                             {
@@ -295,26 +252,163 @@ namespace Devoir_2_Analyse
                         }
                         else
                         {
+                            if(word.Contains("Fin_"))
+                            {
+                                string line = word.Replace("Fin_", "");
+                                Verify(line, "assignation", true);
+                                lines.Add(line);
+                                word = "Fin_";
+                                lfFinProc = true;
+                                lfterm = false;
+                            }
+                            if(c == ';')
+                            {
+                                foundBeginning = false;
+                                lfterm = true;
+                                Verify(word + ";", "assignation");
+                                lines.Add(word + ";");
+                                word = "";
+                                break;
+                            }
                             if (c == '=')
                             {
-                                string variable = word;
-                                word = "";
-                                lfterm = true;                                      // lf term encore pour trouver le permier terme l'autre bord de du =
+                                word += c;
+                                lfterm = true;
                                 foundBeginning = false;
-                                lines.Add(variable);
                             }
                             else
                             {
-                                word += c;
+                                if (c == '+' || c == '-' || c == '*' || c == '/')
+                                {
+                                    lfterm = true;
+                                    foundBeginning = false;
+                                    word += c;
+                                }
+                                else
+                                    word += c;
                             }
                         }
                         break;
 
-                }
+                    case true when lfFinProc:
+                        if (!foundBeginning)
+                        {
+                            if (c != ' ')
+                            {
+                                foundBeginning = true;
+                                word += c;
+                            }
+                        }
+                        else
+                        {
+                            word += c;
+                        }
 
+                        if (word.Length == "Fin_Procedure".Length)
+                        {
+                            if (word == "Fin_Procedure")
+                            {
+                                lfFinProc = false;
+                                lfnom = true;
+                                foundBeginning = false;
+                                word = "";
+                            }
+                            else
+                            {
+                                errors.Add(new Error(ErrorType.ExpectedKeyword, word, "Fin_Procedure"));
+                                word = "";
+                                lfFinProc = false;
+                            }
+                        }
+
+                        break;
+                }
             }
-            return null;
+            //lines.Add(word);
+            Verify(word, "identification", true);
+            word = "";
         }
 
+        private void Verify(string word, string type, bool isLast = false)
+        {
+            switch (true)
+            {
+                case true when type == "identificator":
+
+                    if (!Regex.IsMatch(word, "([A-Za-z]{1}[a-zA-Z0-9]{0,7})$"))
+                        errors.Add(new Error(ErrorType.WrongIdenFormat, word));
+                    if (!keywords.Contains(word))
+                        errors.Add(new Error(ErrorType.CantUseReservedKeywords, word));
+
+                    if (isLast)
+                    {
+                        if (data.firstIden.Equals("word"))
+                            data.lastIden = word;
+                        else
+                            errors.Add(new Error(ErrorType.WrongIdenFormat, word));
+                    }
+                    else
+                    {
+                        data.firstIden = word;
+                    }
+                    break;
+                case true when type == "declaration":
+                    if (Regex.IsMatch(word, "( +[A-Za-z]+ *:{1} *reel *; +| +[A-Za-z]+ *:{1} *entier *; +)$"))
+                    {
+                        string variable = word.Trim().Substring(0, word.IndexOf(":")).Trim();
+                        string varType = word.Trim().Substring(word.IndexOf(":", word.Length - word.IndexOf(":"))).Trim();
+
+                        data.variables.Add(new Variable(variable, varType));
+                    }
+                    else
+                    {
+                        errors.Add(new Error(ErrorType.WrongDeclarationFormat, word));
+                    }
+                    break;
+                case true when type == "assignation":
+                    if(word.Split('(').Length == word.Split(')').Length)
+                    {
+                        /*
+                         
+                        Retirer les espaces avant
+                   
+                         A=A+A;
+
+                        ([A-Za-z]{1}[a-zA-Z0-9]{0,7}=[A-Za-z]{1}[a-zA-Z0-9]{0,7}[+/-]{1}[A-Za-z]{1}[a-zA-Z0-9]{0,7};)
+
+                        A=A+10;
+
+                        ([A-Za-z]{1}[a-zA-Z0-9]{0,7}=[A-Za-z]{1}[a-zA-Z0-9]{0,7}[+/-]{1}[0-9]+;)
+
+                        A=10+a;
+
+                        ([A-Za-z]{1}[a-zA-Z0-9]{0,7}=[0-9]+[+/*-]{1}[A-Za-z]{1}[a-zA-Z0-9]{0,7};)
+
+                        a=10;
+
+                        ([A-Za-z]{1}[a-zA-Z0-9]{0,7}=[0-9]+;)
+
+
+                         */
+                    }
+                    else
+                    {
+                        errors.Add(new Error(ErrorType.WrongAssignationFortmat, word, "( ou )"));
+                    }
+
+
+
+
+                    if (isLast)
+                    {
+                        
+                    }
+                    else
+                    {
+
+                    }
+                    break;
+            }
+        }
     }
 }

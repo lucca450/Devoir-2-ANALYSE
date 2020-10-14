@@ -46,6 +46,8 @@ namespace Devoir_2_Analyse
                     return "Vous ne pouvez utiliser de mots clefs reserves";
                 case true when errorType == ErrorType.VariableNotDeclared:
                     return "Aucune variable déclarée";
+                case true when errorType == ErrorType.WrongAssignationFortmat:
+                    return "Mauvais format d'assignation";
             }
             return "";
         }
