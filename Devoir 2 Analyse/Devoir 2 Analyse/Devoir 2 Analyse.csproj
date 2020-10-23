@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Analyser.cs" />
+    <Compile Include="BinaryTree.cs" />
     <Compile Include="Error.cs" />
     <Compile Include="ErrorType.cs" />
     <Compile Include="MyConsole.cs" />

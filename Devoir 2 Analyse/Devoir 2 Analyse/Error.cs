@@ -48,6 +48,8 @@ namespace Devoir_2_Analyse
                     return "Aucune variable déclarée";
                 case true when errorType == ErrorType.WrongAssignationFortmat:
                     return "Mauvais format d'assignation";
+                case true when errorType == ErrorType.AlreadyDeclaredVariable:
+                    return "Variable déjà déclarée";
             }
             return "";
         }

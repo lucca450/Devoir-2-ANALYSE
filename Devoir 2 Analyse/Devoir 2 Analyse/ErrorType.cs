@@ -18,6 +18,7 @@ namespace Devoir_2_Analyse
         WrongDeclarationFormat,
         CantUseReservedKeywords,
         VariableNotDeclared,
-        WrongAssignationFortmat
+        WrongAssignationFortmat,
+        AlreadyDeclaredVariable
     }
 }
