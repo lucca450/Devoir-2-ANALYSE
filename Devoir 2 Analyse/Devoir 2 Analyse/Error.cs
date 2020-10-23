@@ -29,7 +29,7 @@ namespace Devoir_2_Analyse
                 case true when errorType == ErrorType.MissingCaracter:
                     return "Un caractère est manquant";
                 case true when errorType == ErrorType.UndeclaredVariable:
-                    return "Une variable n'est pas declaree";
+                    return "La variable n'est pas declarée";
                 case true when errorType == ErrorType.WrongIdenFormat:
                     return "Mauvais format d'identificateur";
                 case true when errorType == ErrorType.WrongKeyword:
@@ -43,7 +43,7 @@ namespace Devoir_2_Analyse
                 case true when errorType == ErrorType.WrongDeclarationFormat:
                     return "Mauvais format de declaration";
                 case true when errorType == ErrorType.CantUseReservedKeywords:
-                    return "Vous ne pouvez utiliser de mots clefs reserves";
+                    return "Vous ne pouvez utiliser de mots clefs reservés";
                 case true when errorType == ErrorType.VariableNotDeclared:
                     return "Aucune variable déclarée";
                 case true when errorType == ErrorType.WrongAssignationFortmat:

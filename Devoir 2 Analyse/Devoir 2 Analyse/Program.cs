@@ -18,7 +18,9 @@ namespace Devoir_2_Analyse
 
             List<Error> errors = analyser.CheckCode();
 
-            /*if(errors.Count != 0)
+            
+
+            if(errors.Count != 0)
             {
                 foreach(Error error in errors)
                 {
@@ -28,7 +30,8 @@ namespace Devoir_2_Analyse
             else
             {
                 MyConsole.NoErrorFound();
-            }*/
+            }
+            Console.ReadLine();
         }
     }
 }

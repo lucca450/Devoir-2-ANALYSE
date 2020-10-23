@@ -273,7 +273,7 @@ namespace Devoir_2_Analyse
                             if(word.Contains("Fin_"))
                             {
                                 string line = word.Replace("Fin_", "");
-                                Verify(line, "assignation", true);
+                                //Verify(line, "assignation", true); //à vérifier?? pourquoi l'appeler ici - lucca
                                 lines.Add(line);
                                 word = "Fin_";
                                 lfFinProc = true;
@@ -343,7 +343,7 @@ namespace Devoir_2_Analyse
                 }
             }
             //lines.Add(word);
-            Verify(word, "identification", true);
+            Verify(word, "identificator", true);
             word = "";
         }
 
@@ -360,7 +360,7 @@ namespace Devoir_2_Analyse
 
                     if (isLast)
                     {
-                        if (data.firstIden.Equals("word"))
+                        if (data.firstIden.Equals(word))
                             data.lastIden = word;
                         else
                             errors.Add(new Error(ErrorType.WrongIdenFormat, word));
@@ -408,22 +408,29 @@ namespace Devoir_2_Analyse
 
                         Variable assignedVar = data.ContainsVariableName(name);
 
-                        int parsedResult;
-
-                        if(assignedVar.type == "entier")
+                        if (assignedVar == null)
                         {
-                            if(int.TryParse(result.ToString(), out parsedResult))
-                            {
-                                assignedVar.value = parsedResult.ToString();
-                            }
-                            else
-                            {
-                                errors.Add(new Error(ErrorType.WrongType, assignedVar.name, "reel"));
-                            }
+                            errors.Add(new Error(ErrorType.UndeclaredVariable, name, "Déclarez la variable "+name+" avant de l'utiliser."));
                         }
                         else
                         {
-                            assignedVar.value = result.ToString();
+                            int parsedResult;
+
+                            if(assignedVar.type == "entier")
+                            {
+                                if(int.TryParse(result.ToString(), out parsedResult))
+                                {
+                                    assignedVar.value = parsedResult.ToString();
+                                }
+                                else
+                                {
+                                    errors.Add(new Error(ErrorType.WrongType, assignedVar.name, "reel"));
+                                }
+                            }
+                            else
+                            {
+                                assignedVar.value = result.ToString();
+                            }
                         }
 
                         // Vérifier dans le programme.txt assignations à chiffre à virgule

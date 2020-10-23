@@ -33,7 +33,7 @@ namespace Devoir_2_Analyse
 
             if (error.errorOrigin != "")
             {
-                Console.Write("L'erreur vient de : " + error.errorOrigin);
+                Console.Write("L'erreur viens de : " + error.errorOrigin);
                 if(error.expected != "")
                 {
                     Console.WriteLine(" | Expectation : " + error.expected);
