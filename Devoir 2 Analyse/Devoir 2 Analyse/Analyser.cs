@@ -272,12 +272,21 @@ namespace Devoir_2_Analyse
                         {
                             if(word.Contains("Fin_"))
                             {
-                                string line = word.Replace("Fin_", "");
-                                //Verify(line, "assignation", true); //à vérifier?? pourquoi l'appeler ici - lucca
-                                lines.Add(line);
-                                word = "Fin_";
-                                lfFinProc = true;
-                                lfterm = false;
+                                if (word.Contains(";"))
+                                {
+                                    errors.Add(new Error(ErrorType.WrongAssignationFortmat, word, "undexpected ';'"));
+                                    lfFinProc = true;
+                                    lfterm = false;
+                                }
+                                else
+                                {
+                                    string line = word.Replace("Fin_", "");
+                                    Verify(line, "assignation", true); //à vérifier?? pourquoi l'appeler ici - lucca
+                                    lines.Add(line);
+                                    word = "Fin_";
+                                    lfFinProc = true;
+                                    lfterm = false;
+                                }
                             }
                             if(c == ';')
                             {
@@ -436,31 +445,6 @@ namespace Devoir_2_Analyse
                         // Vérifier dans le programme.txt assignations à chiffre à virgule
                         // ; à la dernière assignation
 
-                        int i = 0;
-
-
-                        /*
-                         
-                        Retirer les espaces avant
-                   
-                         A=A+A;
-
-                        ([A-Za-z]{1}[a-zA-Z0-9]{0,7}=[A-Za-z]{1}[a-zA-Z0-9]{0,7}[+/-]{1}[A-Za-z]{1}[a-zA-Z0-9]{0,7};)
-
-                        A=A+10;
-
-                        
-
-                        A=10+a;
-
-                        
-
-                        a=10;
-
-                        
-
-
-                         */
                     }
                     else
                     {
