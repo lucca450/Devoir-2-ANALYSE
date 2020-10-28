@@ -110,6 +110,7 @@ namespace Devoir_2_Analyse
             bool lfvariabletype = false;
             bool lfterm = false;
             bool lfFinProc = false;
+            bool lastWasSemiColumn = true; 
 
             string word = "";
             foreach(char c in code)
@@ -272,16 +273,17 @@ namespace Devoir_2_Analyse
                         {
                             if(word.Contains("Fin_"))
                             {
-                                if (word.Contains(";"))
+                                string line = word.Replace("Fin_", "");
+                                if (line == "")
                                 {
-                                    errors.Add(new Error(ErrorType.WrongAssignationFortmat, word, "undexpected ';'"));
-                                    lfFinProc = true;
+                                    errors.Add(new Error (ErrorType.WrongAssignationFortmat, word,"La dernière assignation ne peut pas contenir de ';'"));
                                     lfterm = false;
+                                    lfFinProc = true;
                                 }
                                 else
-                                {
-                                    string line = word.Replace("Fin_", "");
-                                    Verify(line, "assignation", true); //à vérifier?? pourquoi l'appeler ici - lucca
+                                {   
+
+                                    Verify(line, "assignation", true); 
                                     lines.Add(line);
                                     word = "Fin_";
                                     lfFinProc = true;
@@ -462,7 +464,7 @@ namespace Devoir_2_Analyse
 
             int nbOp = expression.ToCharArray().Count(c => c == '/' || c == '*' || c == '+' || c == '-');
             int nbFoundOp = 0;
-            MatchCollection mc = Regex.Matches(expression.Replace(";", ""), @"([*+/\-)(])|([0-9A-Za-z]+)");
+            MatchCollection mc = Regex.Matches(expression.Replace(";", ""), @"([*+/\-)(])|([0-9A-Za-z.,]+)");
 
             foreach (var i in mc)
             {
@@ -511,6 +513,7 @@ namespace Devoir_2_Analyse
                 }
                 else
                 {
+                    node.value = node.value.Replace('.',',');
                     return double.Parse(node.value);
                 }
             }    
